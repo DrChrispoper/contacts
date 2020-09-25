@@ -1,0 +1,12 @@
+{
+  "name": "EmmaChallenge",
+  "displayName": "EmmaChallenge",
+  "expo": {
+    "name": "EmmaChallenge",
+    "slug": "EmmaChallenge",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
