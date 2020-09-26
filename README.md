@@ -67,3 +67,13 @@ We will use [Jest](https://facebook.github.io/jest/) testing library because it 
 
 To run the tests, execute ```yarn test``` in a terminal opened in the project folder.
 If you want to re-test each time you modify a test file, run ```yarn run test:watch```. Jest will watch for file changes and relaunch the tests for you.
+
+## TODO
+
+- [ ] Initial Setup
+- [ ] Vertical List of Text elements
+- [ ] Text to JSON
+- [ ] Horizontal List of Images
+- [ ] Link Image to Text
+- [ ] Link scrolling
+- [ ] Detail View on Image Tap
