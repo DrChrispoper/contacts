@@ -11,20 +11,15 @@
     }
   },
   "rules": {
-    "react/jsx-filename-extension": [
-      2,
-      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
-    ],
-    "import/no-extraneous-dependencies": [
-      2,
-      { "devDependencies": ["**/test.tsx", "**/test.ts"] }
-    ],
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+    "import/no-extraneous-dependencies": [2, { "devDependencies": ["**/test.tsx", "**/test.ts"] }],
     "@typescript-eslint/indent": [2, 2],
     // note you must disable the base rule as it can report incorrect errors
     "no-use-before-define": "off",
     "arrow-parens": ["error", "as-needed"],
     "@typescript-eslint/no-use-before-define": ["error"],
     "operator-linebreak": ["error", "after"],
+    "object-curly-newline": ["error", { "consistent": true }],
     "import/extensions": [
       "error",
       "ignorePackages",
