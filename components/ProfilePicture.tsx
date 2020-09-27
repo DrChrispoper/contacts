@@ -1,13 +1,12 @@
 import React from 'react';
-import { StyleSheet, Image, TouchableOpacity, ViewStyle } from 'react-native';
+import { StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Profile } from '../utils/types';
-import { Allan } from '../utils/imageLoader';
 
 const styles = StyleSheet.create({
   item: {
     padding: 0,
     marginVertical: 8,
-    marginHorizontal: 16,
+    marginHorizontal: 8,
     width: 70,
     height: 70,
   },
@@ -15,7 +14,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 5,
     borderColor: '#b1d8ff',
-    borderRadius: 150 / 2,
+    borderRadius: 70 / 2,
   },
 });
 

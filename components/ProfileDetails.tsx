@@ -13,8 +13,9 @@ interface Style {
 
 const styles = StyleSheet.create<Style>({
   item: {
-    padding: 20,
-    marginVertical: 8,
+    paddingRight: 20,
+    paddingLeft: 20,
+    marginVertical: 0,
     marginHorizontal: 0,
   },
   firstName: {

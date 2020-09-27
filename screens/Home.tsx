@@ -1,22 +1,18 @@
 import React, { FC, useState } from 'react';
 import {
   StyleSheet,
-  FlatList,
   SafeAreaView,
   StatusBar,
   Dimensions,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
+  Animated,
   ViewStyle,
+  PanResponder,
 } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/stack';
 
-import { Profile } from '../utils/types';
 import ProfilePicture from '../components/ProfilePicture';
 import ProfileDetails from '../components/ProfileDetails';
 import getProfiles from '../utils/loadData';
-
-const NB_ITEMS_SCREEN = 1;
 
 const ScreenHeight = Dimensions.get('window').height;
 const ScreenWidth = Dimensions.get('window').width;
@@ -25,9 +21,6 @@ interface flatListRefFunc {
   viewableItems: Array<any>;
 }
 
-interface renderItem {
-  item: Profile;
-}
 interface Style {
   container: ViewStyle;
 }
@@ -45,56 +38,81 @@ const profiles = getProfiles();
 const Home: FC = () => {
   const [selectedId, setSelectedId] = useState<string>(profiles[0].id);
   const headerHeight = useHeaderHeight();
-  const listVRef = React.useRef<null | any>(null);
-  const listHRef = React.useRef<null | any>(null);
-  const [hScroll, sethScroll] = useState(false);
-  const [vScroll, setvScroll] = useState(false);
+  const detailsRef = React.useRef<null | any>(null);
+  const picsRef = React.useRef<null | any>(null);
+  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const scrollX = React.useRef(new Animated.Value(0)).current;
+  const [isPicsScrolling, setisPics] = useState(false);
+
+  const panResponderPics = React.useRef(
+    PanResponder.create({
+      onPanResponderGrant: () => {
+        setisPics(true);
+      },
+      // eslint-disable-next-line comma-dangle
+    })
+  ).current;
+
+  const panResponderDetails = React.useRef(
+    PanResponder.create({
+      onPanResponderGrant: () => {
+        setisPics(false);
+      },
+      // eslint-disable-next-line comma-dangle
+    })
+  ).current;
+
+  const onScrollDetails = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+    useNativeDriver: true,
+  });
+
+  const onScrollPics = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+    useNativeDriver: true,
+  });
+
+  const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
+
+  React.useEffect(() => {
+    scrollX.removeAllListeners();
+    scrollY.removeAllListeners();
+    if (!isPicsScrolling) {
+      scrollY.addListener(v => {
+        if (picsRef?.current) {
+          picsRef.current.scrollToOffset({
+            offset: (v.value / itemHeight) * 86,
+            animated: false,
+          });
+        }
+      });
+    } else {
+      scrollX.addListener(v => {
+        if (detailsRef?.current) {
+          detailsRef.current.scrollToOffset({
+            offset: (v.value / 86) * itemHeight,
+            animated: false,
+          });
+        }
+      });
+    }
+  }, [isPicsScrolling]);
 
   const scrollToAndSelect = (id: string) => {
     const index = profiles.findIndex(item => item.id === id);
 
-    if (listHRef && listHRef.current && index >= 0) {
-      listVRef.current.scrollToIndex({ index, viewPosition: 0 });
+    if (detailsRef && detailsRef.current && index >= 0) {
+      detailsRef.current.scrollToIndex({ index, viewPosition: 0 });
     }
   };
 
   const onViewRef = React.useRef(({ viewableItems }: flatListRefFunc) => {
-    if (viewableItems && viewableItems[0] && !hScroll) {
-      sethScroll(true);
-      setvScroll(false);
+    if (viewableItems && viewableItems[0]) {
       // Use viewable items in state or as intended
       // Get the first viewable item
       const firstViewItem = viewableItems[0].key;
       // Get its index into the items
       const index = profiles.findIndex(item => item.id === firstViewItem);
       // console.log(index);
-      if (listHRef && listHRef.current && index >= 0) {
-        listHRef.current.scrollToIndex({ index, viewPosition: 0.5 });
-        setSelectedId(firstViewItem);
-      }
-    }
-  });
-
-  const onViewRefH = React.useRef(({ viewableItems }: flatListRefFunc) => {
-    if (viewableItems && !vScroll) {
-      sethScroll(false);
-      setvScroll(true);
-      // Use viewable items in state or as intended
-      // Get the first viewable item
-      let itemToSelect = 0;
-      if (viewableItems.length === 4) {
-        itemToSelect = 1;
-      }
-      if (viewableItems.length === 5) {
-        itemToSelect = 2;
-      }
-      const firstViewItem = viewableItems[itemToSelect].key;
-      console.log(viewableItems.length);
-      // Get its index into the items
-      const index = profiles.findIndex(item => item.id === firstViewItem);
-      // console.log(index);
-      if (listHRef && listHRef.current && index >= 0) {
-        listVRef.current.scrollToIndex({ index, viewPosition: 0 });
+      if (index >= 0) {
         setSelectedId(firstViewItem);
       }
     }
@@ -102,66 +120,57 @@ const Home: FC = () => {
 
   const viewConfigRef = React.useRef({
     viewAreaCoveragePercentThreshold: 50,
-    waitForInteraction: true,
   });
-
-  const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
-
-  const renderItemV = ({ item }: renderItem) => (
-    <ProfileDetails
-      item={item}
-      onPress={() => scrollToAndSelect(item.id)}
-      style={{ height: itemHeight }}
-    />
-  );
-
-  const renderItemH = ({ item }: renderItem) => (
-    <ProfilePicture
-      item={item}
-      onPress={() => scrollToAndSelect(item.id)}
-      isSelected={item.id === selectedId}
-    />
-  );
-
-  const handleScrollH = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // console.log((event.nativeEvent.contentOffset.x / event.nativeEvent.contentSize.width) * 100);
-    if (listVRef && listVRef.current && listVRef.current) {
-      // listVRef.current.scrollToOffset({ offset: event.nativeEvent.contentOffset.x * 10 });
-    }
-  };
-
-  const handleScrollV = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // console.log((event.nativeEvent.contentOffset.y / event.nativeEvent.contentSize.height) * 100);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        contentContainerStyle={{ paddingLeft: ScreenWidth / 2 - 50 }}
+      <Animated.FlatList
+        contentContainerStyle={{
+          paddingLeft: ScreenWidth / 2 - 70 / 2,
+          paddingRight: ScreenWidth / 2 - 70 / 2,
+        }}
         data={profiles}
-        renderItem={renderItemH}
+        renderItem={({ item }) => (
+          <ProfilePicture
+            item={item}
+            onPress={() => scrollToAndSelect(item.id)}
+            isSelected={item.id === selectedId}
+          />
+        )}
         keyExtractor={item => item.id}
         extraData={selectedId}
         horizontal
-        onScroll={handleScrollH}
+        snapToAlignment="start"
+        snapToInterval={70 + 16}
+        decelerationRate="fast"
         style={{ height: 100 }}
-        ref={listHRef}
-        onViewableItemsChanged={onViewRefH.current}
-        onMomentumScrollEnd={({ nativeEvent }) => sethScroll(false)}
+        ref={picsRef}
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={onScrollPics}
+        {...panResponderPics.panHandlers}
       />
-      <FlatList
+      <Animated.FlatList
         data={profiles}
-        renderItem={renderItemV}
+        renderItem={({ item }) => (
+          <ProfileDetails
+            item={item}
+            onPress={() => scrollToAndSelect(item.id)}
+            style={{ height: itemHeight }}
+          />
+        )}
         keyExtractor={item => item.id}
         extraData={selectedId}
         snapToAlignment="start"
-        snapToInterval={itemHeight + 16}
+        snapToInterval={itemHeight + 8}
         decelerationRate="fast"
         onViewableItemsChanged={onViewRef.current}
         viewabilityConfig={viewConfigRef.current}
-        onScroll={handleScrollV}
-        ref={listVRef}
-        onMomentumScrollEnd={({ nativeEvent }) => setvScroll(false)}
+        ref={detailsRef}
+        showsVerticalScrollIndicator={false}
+        onScroll={onScrollDetails}
+        scrollEventThrottle={16}
+        {...panResponderDetails.panHandlers}
       />
     </SafeAreaView>
   );
