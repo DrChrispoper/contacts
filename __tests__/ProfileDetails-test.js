@@ -1,7 +1,7 @@
 import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import renderer from 'react-test-renderer';
-import ProfileDetails from '../components/ProfileDetails';
+import ProfileDetails from '../App/components/ProfileDetails';
 
 test('renders correctly', () => {
   const profile = {

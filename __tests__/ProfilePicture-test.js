@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { TouchableOpacity } from 'react-native';
-import ProfilePicture from '../components/ProfilePicture';
+import ProfilePicture from '../App/components/ProfilePicture';
 
 Enzyme.configure({ adapter: new Adapter() });
 
