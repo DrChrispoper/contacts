@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useRef } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -40,14 +40,16 @@ const Home: FC = () => {
   const headerHeight = useHeaderHeight();
   const detailsRef = React.useRef<null | any>(null);
   const picsRef = React.useRef<null | any>(null);
-  const scrollY = React.useRef(new Animated.Value(0)).current;
-  const scrollX = React.useRef(new Animated.Value(0)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollX = useRef(new Animated.Value(0)).current;
   const [isPicsScrolling, setisPics] = useState(false);
 
   const panResponderPics = React.useRef(
     PanResponder.create({
       onPanResponderGrant: () => {
-        setisPics(true);
+        if (!isPicsScrolling) {
+          setisPics(true);
+        }
       },
       // eslint-disable-next-line comma-dangle
     })
@@ -56,7 +58,9 @@ const Home: FC = () => {
   const panResponderDetails = React.useRef(
     PanResponder.create({
       onPanResponderGrant: () => {
-        setisPics(false);
+        if (isPicsScrolling) {
+          setisPics(false);
+        }
       },
       // eslint-disable-next-line comma-dangle
     })
@@ -73,11 +77,14 @@ const Home: FC = () => {
   const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
 
   React.useEffect(() => {
-    scrollX.removeAllListeners();
-    scrollY.removeAllListeners();
     if (!isPicsScrolling) {
       scrollY.addListener(v => {
         if (picsRef?.current) {
+          /* picsRef.current.scrollToIndex({
+            index: Math.round(v.value / 86),
+            animated: true,
+          }); */
+
           picsRef.current.scrollToOffset({
             offset: (v.value / itemHeight) * 86,
             animated: false,
@@ -87,13 +94,20 @@ const Home: FC = () => {
     } else {
       scrollX.addListener(v => {
         if (detailsRef?.current) {
-          detailsRef.current.scrollToOffset({
+          console.log('scroll to v.value:', Math.round(v.value / 86));
+          detailsRef.current.scrollToIndex({ index: Math.round(v.value / 86), animated: true });
+          /* detailsRef.current.scrollToOffset({
             offset: (v.value / 86) * itemHeight,
             animated: false,
-          });
+          }); */
         }
       });
     }
+
+    return function cleanup() {
+      scrollX.removeAllListeners();
+      scrollY.removeAllListeners();
+    };
   }, [isPicsScrolling]);
 
   const scrollToAndSelect = (id: string) => {
@@ -112,7 +126,7 @@ const Home: FC = () => {
       // Get its index into the items
       const index = profiles.findIndex(item => item.id === firstViewItem);
       // console.log(index);
-      if (index >= 0) {
+      if (index >= 0 && firstViewItem !== selectedId) {
         setSelectedId(firstViewItem);
       }
     }
@@ -152,17 +166,11 @@ const Home: FC = () => {
       />
       <Animated.FlatList
         data={profiles}
-        renderItem={({ item }) => (
-          <ProfileDetails
-            item={item}
-            onPress={() => scrollToAndSelect(item.id)}
-            style={{ height: itemHeight }}
-          />
-        )}
+        renderItem={({ item }) => <ProfileDetails item={item} style={{ height: itemHeight }} />}
         keyExtractor={item => item.id}
         extraData={selectedId}
         snapToAlignment="start"
-        snapToInterval={itemHeight + 8}
+        snapToInterval={itemHeight}
         decelerationRate="fast"
         onViewableItemsChanged={onViewRef.current}
         viewabilityConfig={viewConfigRef.current}
@@ -170,6 +178,8 @@ const Home: FC = () => {
         showsVerticalScrollIndicator={false}
         onScroll={onScrollDetails}
         scrollEventThrottle={16}
+        bounces={false}
+        getItemLayout={(data, index) => ({ length: itemHeight, offset: itemHeight * index, index })}
         {...panResponderDetails.panHandlers}
       />
     </SafeAreaView>

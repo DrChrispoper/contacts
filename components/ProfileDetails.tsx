@@ -45,28 +45,21 @@ const styles = StyleSheet.create<Style>({
 
 interface Props {
   item: Profile;
-  onPress: () => void;
   style: ViewStyle;
 }
 
-const ProfileDetails: React.FC<Props> = ({ item, onPress, style }: Props) => {
-  const names = item.name.split(' ');
-  const firstName = names.shift();
-  const lastName = names.join(' ');
-
-  return (
-    <TouchableOpacity onPress={onPress} style={[styles.item, style]}>
-      <View style={styles.name}>
-        <Text style={styles.name}>
-          <Text style={styles.firstName}>{firstName}</Text>
-          {` ${lastName}`}
-        </Text>
-      </View>
-      <Text style={styles.role}>{item.role}</Text>
-      <Text style={styles.aboutTitle}>About me</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </TouchableOpacity>
-  );
-};
+const ProfileDetails: React.FC<Props> = ({ item, style }: Props) => (
+  <TouchableOpacity style={[styles.item, style]}>
+    <View style={styles.name}>
+      <Text style={styles.name}>
+        <Text style={styles.firstName}>{item.firstName}</Text>
+        {` ${item.lastName}`}
+      </Text>
+    </View>
+    <Text style={styles.role}>{item.role}</Text>
+    <Text style={styles.aboutTitle}>About me</Text>
+    <Text style={styles.description}>{item.description}</Text>
+  </TouchableOpacity>
+);
 
 export default ProfileDetails;

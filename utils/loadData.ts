@@ -9,10 +9,15 @@ const getProfiles = (): Array<Profile> => {
 
   profilesJSON.data.forEach(jsonProfile => {
     const imgURL: string = jsonProfile.name.split(' ')[0];
+    const names = jsonProfile.name.split(' ');
+    const firstName = names.shift() || '';
+    const lastName = names.join(' ');
 
     const profile: Profile = {
       id: uuidv4(),
-      name: jsonProfile.name,
+      fullName: jsonProfile.name,
+      firstName,
+      lastName,
       role: jsonProfile.role,
       picture: images[imgURL],
       description:
