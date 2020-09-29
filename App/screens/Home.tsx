@@ -1,4 +1,5 @@
-import React, { FC, useState, useRef } from 'react';
+/* eslint-disable comma-dangle */
+import React, { FC, useState, useRef, useCallback } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -9,6 +10,7 @@ import {
   PanResponder,
 } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/stack';
+import _ from 'lodash';
 
 import ProfilePicture from '../components/ProfilePicture';
 import ProfileDetails from '../components/ProfileDetails';
@@ -16,10 +18,6 @@ import getProfiles from '../utils/loadData';
 
 const ScreenHeight = Dimensions.get('window').height;
 const ScreenWidth = Dimensions.get('window').width;
-
-interface flatListRefFunc {
-  viewableItems: Array<any>;
-}
 
 interface Style {
   container: ViewStyle;
@@ -47,9 +45,7 @@ const Home: FC = () => {
   const panResponderPics = React.useRef(
     PanResponder.create({
       onPanResponderGrant: () => {
-        if (!isPicsScrolling) {
-          setisPics(true);
-        }
+        setisPics(true);
       },
       // eslint-disable-next-line comma-dangle
     })
@@ -58,9 +54,7 @@ const Home: FC = () => {
   const panResponderDetails = React.useRef(
     PanResponder.create({
       onPanResponderGrant: () => {
-        if (isPicsScrolling) {
-          setisPics(false);
-        }
+        setisPics(false);
       },
       // eslint-disable-next-line comma-dangle
     })
@@ -76,30 +70,55 @@ const Home: FC = () => {
 
   const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
 
+  const checkIndex = (index: number): number => {
+    let checkedIndex = 0;
+
+    // Check for out of bounds index from scroll bouncing;
+    if (index >= 0) {
+      if (index >= profiles.length) {
+        checkedIndex = profiles.length - 1;
+      } else {
+        checkedIndex = index;
+      }
+    }
+
+    return checkedIndex;
+  };
+
+  const delayedScrollDetails = useCallback(
+    _.throttle(q => {
+      detailsRef.current.scrollToIndex({
+        index: checkIndex(Math.round(q.value / 86)),
+        animated: true,
+      });
+    }, 100),
+    []
+  );
+
+  const delayedScrollPics = useCallback(
+    _.throttle(q => {
+      picsRef.current.scrollToOffset({ offset: (q.value / itemHeight) * 86, animated: false });
+    }, 0),
+    []
+  );
+
+  const checkAndSelectIndex = (index: number) => {
+    setSelectedId(profiles[checkIndex(index)].id);
+  };
+
   React.useEffect(() => {
     if (!isPicsScrolling) {
       scrollY.addListener(v => {
         if (picsRef?.current) {
-          /* picsRef.current.scrollToIndex({
-            index: Math.round(v.value / 86),
-            animated: true,
-          }); */
-
-          picsRef.current.scrollToOffset({
-            offset: (v.value / itemHeight) * 86,
-            animated: false,
-          });
+          checkAndSelectIndex(Math.round(v.value / itemHeight));
+          delayedScrollPics(v);
         }
       });
     } else {
       scrollX.addListener(v => {
         if (detailsRef?.current) {
-          console.log('scroll to v.value:', Math.round(v.value / 86));
-          detailsRef.current.scrollToIndex({ index: Math.round(v.value / 86), animated: true });
-          /* detailsRef.current.scrollToOffset({
-            offset: (v.value / 86) * itemHeight,
-            animated: false,
-          }); */
+          checkAndSelectIndex(Math.round(v.value / 86));
+          delayedScrollDetails(v);
         }
       });
     }
@@ -117,24 +136,6 @@ const Home: FC = () => {
       detailsRef.current.scrollToIndex({ index, viewPosition: 0 });
     }
   };
-
-  const onViewRef = React.useRef(({ viewableItems }: flatListRefFunc) => {
-    if (viewableItems && viewableItems[0]) {
-      // Use viewable items in state or as intended
-      // Get the first viewable item
-      const firstViewItem = viewableItems[0].key;
-      // Get its index into the items
-      const index = profiles.findIndex(item => item.id === firstViewItem);
-      // console.log(index);
-      if (index >= 0 && firstViewItem !== selectedId) {
-        setSelectedId(firstViewItem);
-      }
-    }
-  });
-
-  const viewConfigRef = React.useRef({
-    viewAreaCoveragePercentThreshold: 50,
-  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,8 +173,6 @@ const Home: FC = () => {
         snapToAlignment="start"
         snapToInterval={itemHeight}
         decelerationRate="fast"
-        onViewableItemsChanged={onViewRef.current}
-        viewabilityConfig={viewConfigRef.current}
         ref={detailsRef}
         showsVerticalScrollIndicator={false}
         onScroll={onScrollDetails}
