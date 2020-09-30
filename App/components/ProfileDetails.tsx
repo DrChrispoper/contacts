@@ -48,18 +48,23 @@ interface Props {
   style: ViewStyle;
 }
 
-const ProfileDetails: React.FC<Props> = ({ item, style }: Props) => (
-  <TouchableOpacity style={[styles.item, style]}>
-    <View style={styles.name}>
-      <Text style={styles.name}>
-        <Text style={styles.firstName}>{item.firstName}</Text>
-        {` ${item.lastName}`}
-      </Text>
-    </View>
-    <Text style={styles.role}>{item.role}</Text>
-    <Text style={styles.aboutTitle}>About me</Text>
-    <Text style={styles.description}>{item.description}</Text>
-  </TouchableOpacity>
-);
+class ProfileDetails extends React.PureComponent<Props> {
+  render(): JSX.Element {
+    const { item, style } = this.props;
+    return (
+      <TouchableOpacity style={[styles.item, style]}>
+        <View style={styles.name}>
+          <Text style={styles.name}>
+            <Text style={styles.firstName}>{item.firstName}</Text>
+            {` ${item.lastName}`}
+          </Text>
+        </View>
+        <Text style={styles.role}>{item.role}</Text>
+        <Text style={styles.aboutTitle}>About me</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </TouchableOpacity>
+    );
+  }
+}
 
 export default ProfileDetails;

@@ -24,10 +24,15 @@ interface Props {
   isSelected: boolean;
 }
 
-const ProfilePicture: React.FC<Props> = ({ item, onPress, isSelected }: Props) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, isSelected && styles.active]}>
-    <Image source={item.picture} />
-  </TouchableOpacity>
-);
+class ProfilePicture extends React.PureComponent<Props> {
+  render(): JSX.Element {
+    const { item, onPress, isSelected } = this.props;
+    return (
+      <TouchableOpacity onPress={onPress} style={[styles.item, isSelected && styles.active]}>
+        <Image source={item.picture} />
+      </TouchableOpacity>
+    );
+  }
+}
 
 export default ProfilePicture;
