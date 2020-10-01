@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     width: 70,
     height: 70,
+    transform: [{ rotate: '90deg' }],
   },
   active: {
     overflow: 'hidden',
