@@ -1,13 +1,14 @@
 /* eslint-disable comma-dangle */
 import React, { FC, useState, useRef, useCallback } from 'react';
 import { StyleSheet, SafeAreaView, StatusBar, Dimensions, Animated, ViewStyle } from 'react-native';
-import { useHeaderHeight } from '@react-navigation/stack';
+import { useHeaderHeight, StackNavigationProp } from '@react-navigation/stack';
 import _ from 'lodash';
 
 import getProfiles from '../utils/loadData';
 import { checkIndex } from '../utils/help';
 import ProfilePicList from '../components/ProfilePicList';
 import ProfileDetList from '../components/ProfileDetList';
+import { RootStackParamList } from '../utils/types';
 
 const ScreenHeight = Dimensions.get('window').height;
 const PICS_WIDTH = 86;
@@ -26,14 +27,19 @@ const styles = StyleSheet.create<Style>({
 
 const profiles = getProfiles();
 
-const Home: FC = () => {
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+type Props = {
+  navigation: HomeScreenNavigationProp;
+};
+
+const Home: FC<Props> = ({ navigation }: Props) => {
   const [selectedId, setSelectedId] = useState<string>(profiles[0].id);
   const headerHeight = useHeaderHeight();
   const detailsRef = React.useRef<null | any>(null);
   const picsRef = React.useRef<null | any>(null);
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollX = useRef(new Animated.Value(0)).current;
-  // const [isPicsScrolling, setisPics] = useState(false);
 
   const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
 
@@ -48,7 +54,8 @@ const Home: FC = () => {
   );
 
   const checkAndSelectIndex = (index: number) => {
-    setSelectedId(profiles[checkIndex(index, profiles.length)].id);
+    const { id } = profiles[checkIndex(index, profiles.length)];
+    setSelectedId(id);
   };
 
   const picsScrolling = (v: { value: number }) => {
@@ -68,37 +75,14 @@ const Home: FC = () => {
     }
   };
 
-  /* React.useEffect(() => {
-    if (!isPicsScrolling) {
-      scrollY.addListener(v => {
-        if (picsRef?.current) {
-          checkAndSelectIndex(Math.round(v.value / itemHeight));
-          picsRef.current.scrollToOffset({
-            offset: (v.value / itemHeight) * PICS_WIDTH,
-            animated: false,
-          });
-        }
-      });
-    } else {
-      scrollX.addListener(v => {
-        if (detailsRef?.current) {
-          checkAndSelectIndex(Math.round(v.value / PICS_WIDTH));
-          delayedScrollDetails(v);
-        }
-      });
-    }
-
-    return function cleanup() {
-      scrollX.removeAllListeners();
-      scrollY.removeAllListeners();
-    };
-  }, [isPicsScrolling]); */
-
   const scrollToAndSelect = (id: string) => {
     const index = profiles.findIndex(item => item.id === id);
 
     if (detailsRef && detailsRef.current && index >= 0) {
       detailsRef.current.scrollToIndex({ index, viewPosition: 0 });
+    }
+    if (selectedId === id) {
+      navigation.navigate('DetailPage', { item: profiles[index] });
     }
   };
 

@@ -24,7 +24,6 @@ const ProfileDetList = ({
     PanResponder.create({
       onMoveShouldSetPanResponder: () => {
         // setisPics(false);
-        console.log('add details listener');
         scrollY.addListener(v => {
           detsScrolling(v);
         });
@@ -39,7 +38,6 @@ const ProfileDetList = ({
   });
 
   const onMomentumScrollEnd = () => {
-    console.log('remove details listener');
     scrollY.removeAllListeners();
   };
 

@@ -29,7 +29,6 @@ const ProfilePicList = ({
       onMoveShouldSetPanResponder: () => {
         // Listen for your events and show UI feedback here
         // setisPics(true);
-        console.log('add pics listner');
         scrollX.addListener(v => {
           picsScrolling(v);
         });
@@ -44,7 +43,6 @@ const ProfilePicList = ({
   });
 
   const onMomentumScrollEnd = () => {
-    console.log('remove pics listner');
     scrollX.removeAllListeners();
   };
 

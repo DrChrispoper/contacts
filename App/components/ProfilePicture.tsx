@@ -20,13 +20,13 @@ const styles = StyleSheet.create({
 
 interface Props {
   item: Profile;
-  onPress: () => void;
-  isSelected: boolean;
+  onPress?: () => void;
+  isSelected?: boolean;
 }
 
 class ProfilePicture extends React.PureComponent<Props> {
   render(): JSX.Element {
-    const { item, onPress, isSelected } = this.props;
+    const { item, onPress, isSelected = false } = this.props;
     return (
       <TouchableOpacity onPress={onPress} style={[styles.item, isSelected && styles.active]}>
         <Image source={item.picture} />
