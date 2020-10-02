@@ -75,15 +75,16 @@ const Home: FC<Props> = ({ navigation }: Props) => {
     scrollTo(detailsRef, 0, sharedSelectedId.value * itemHeight, true);
     scrollTo(picsRef, 0, sharedSelectedId.value * PICS_WIDTH, true);
   });
+
   const scrollHandlerPics = useAnimatedScrollHandler({
     onScroll: event => {
-      transYP.value = event.contentOffset.y;
+      transYP.value = event.contentOffset.x;
 
-      const index = Math.round(event.contentOffset.y / PICS_WIDTH);
+      const index = Math.round(event.contentOffset.x / PICS_WIDTH);
       if (Platform.OS === 'ios') {
         checkAndSelectIndex(index);
       }
-      const offset = (event.contentOffset.y / PICS_WIDTH) * itemHeight;
+      const offset = (event.contentOffset.x / PICS_WIDTH) * itemHeight;
       scrollTo(detailsRef, 0, offset, false);
     },
     onBeginDrag: () => {
@@ -93,7 +94,7 @@ const Home: FC<Props> = ({ navigation }: Props) => {
       isScrollingPics.value = false;
     },
     onMomentumEnd: event => {
-      const index = Math.round(event.contentOffset.y / PICS_WIDTH);
+      const index = Math.round(event.contentOffset.x / PICS_WIDTH);
       checkAndSelectIndex(index);
     },
   });
@@ -106,7 +107,7 @@ const Home: FC<Props> = ({ navigation }: Props) => {
         checkAndSelectIndex(index);
       }
       const offset = (event.contentOffset.y / itemHeight) * PICS_WIDTH;
-      scrollTo(picsRef, 0, offset, false);
+      scrollTo(picsRef, offset, 0, false);
     },
     onBeginDrag: () => {
       isScrollingDetails.value = true;
