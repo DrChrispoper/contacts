@@ -9,3 +9,5 @@ export interface Profile {
   picture: ImageSourcePropType;
   description: string;
 }
+
+export type RootStackParamList = { Home: undefined; DetailPage: { item: Profile } };

@@ -1,13 +1,19 @@
 /* eslint-disable comma-dangle */
-import React, { FC, useState, useRef, useCallback } from 'react';
-import { StyleSheet, SafeAreaView, StatusBar, Dimensions, Animated, ViewStyle } from 'react-native';
-import { useHeaderHeight } from '@react-navigation/stack';
-import _ from 'lodash';
+import React, { FC, useState } from 'react';
+import { StyleSheet, SafeAreaView, StatusBar, Dimensions, ViewStyle, Platform } from 'react-native';
+import { useHeaderHeight, StackNavigationProp } from '@react-navigation/stack';
+import {
+  useSharedValue,
+  useAnimatedScrollHandler,
+  scrollTo,
+  useAnimatedRef,
+} from 'react-native-reanimated';
 
 import getProfiles from '../utils/loadData';
 import { checkIndex } from '../utils/help';
 import ProfilePicList from '../components/ProfilePicList';
 import ProfileDetList from '../components/ProfileDetList';
+import { RootStackParamList } from '../utils/types';
 
 const ScreenHeight = Dimensions.get('window').height;
 const PICS_WIDTH = 86;
@@ -26,81 +32,82 @@ const styles = StyleSheet.create<Style>({
 
 const profiles = getProfiles();
 
-const Home: FC = () => {
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+
+type Props = {
+  navigation: HomeScreenNavigationProp;
+};
+
+const Home: FC<Props> = ({ navigation }: Props) => {
   const [selectedId, setSelectedId] = useState<string>(profiles[0].id);
   const headerHeight = useHeaderHeight();
-  const detailsRef = React.useRef<null | any>(null);
-  const picsRef = React.useRef<null | any>(null);
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const scrollX = useRef(new Animated.Value(0)).current;
-  // const [isPicsScrolling, setisPics] = useState(false);
+  const detailsRef: any = useAnimatedRef();
+  const picsRef: any = useAnimatedRef();
+  const isScrollingPics = useSharedValue(false);
+  const isScrollingDetails = useSharedValue(false);
+  const transYD = useSharedValue(0);
+  const transYP = useSharedValue(0);
 
   const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
 
-  const delayedScrollDetails = useCallback(
-    _.throttle(q => {
-      detailsRef.current.scrollToOffset({
-        offset: (q.value / PICS_WIDTH) * itemHeight,
-        animated: false,
-      });
-    }, 100),
-    []
-  );
-
   const checkAndSelectIndex = (index: number) => {
-    setSelectedId(profiles[checkIndex(index, profiles.length)].id);
+    const checked = checkIndex(index, profiles.length);
+    const { id } = profiles[checked];
+    setSelectedId(id);
   };
-
-  const picsScrolling = (v: { value: number }) => {
-    if (detailsRef?.current) {
-      checkAndSelectIndex(Math.round(v.value / PICS_WIDTH));
-      delayedScrollDetails(v);
-    }
-  };
-
-  const detsScrolling = (v: { value: number }) => {
-    if (picsRef?.current) {
-      checkAndSelectIndex(Math.round(v.value / itemHeight));
-      picsRef.current.scrollToOffset({
-        offset: (v.value / itemHeight) * PICS_WIDTH,
-        animated: false,
-      });
-    }
-  };
-
-  /* React.useEffect(() => {
-    if (!isPicsScrolling) {
-      scrollY.addListener(v => {
-        if (picsRef?.current) {
-          checkAndSelectIndex(Math.round(v.value / itemHeight));
-          picsRef.current.scrollToOffset({
-            offset: (v.value / itemHeight) * PICS_WIDTH,
-            animated: false,
-          });
-        }
-      });
-    } else {
-      scrollX.addListener(v => {
-        if (detailsRef?.current) {
-          checkAndSelectIndex(Math.round(v.value / PICS_WIDTH));
-          delayedScrollDetails(v);
-        }
-      });
-    }
-
-    return function cleanup() {
-      scrollX.removeAllListeners();
-      scrollY.removeAllListeners();
-    };
-  }, [isPicsScrolling]); */
 
   const scrollToAndSelect = (id: string) => {
     const index = profiles.findIndex(item => item.id === id);
 
-    if (detailsRef && detailsRef.current && index >= 0) {
-      detailsRef.current.scrollToIndex({ index, viewPosition: 0 });
+    if (selectedId === id) {
+      navigation.navigate('DetailPage', { item: profiles[index] });
     }
   };
+
+  const scrollHandlerPics = useAnimatedScrollHandler({
+    onScroll: event => {
+      transYP.value = event.contentOffset.y;
+
+      const index = Math.round(event.contentOffset.y / PICS_WIDTH);
+      if (Platform.OS === 'ios') {
+        checkAndSelectIndex(index);
+      }
+      const offset = (event.contentOffset.y / PICS_WIDTH) * itemHeight;
+      scrollTo(detailsRef, 0, offset, false);
+    },
+    onBeginDrag: () => {
+      isScrollingPics.value = true;
+    },
+    onEndDrag: () => {
+      isScrollingPics.value = false;
+    },
+    onMomentumEnd: event => {
+      const index = Math.round(event.contentOffset.y / PICS_WIDTH);
+      checkAndSelectIndex(index);
+    },
+  });
+
+  const scrollHandlerDetails = useAnimatedScrollHandler({
+    onScroll: event => {
+      transYD.value = event.contentOffset.y;
+      const index = Math.round(event.contentOffset.y / itemHeight);
+      if (Platform.OS === 'ios') {
+        checkAndSelectIndex(index);
+      }
+      const offset = (event.contentOffset.y / itemHeight) * PICS_WIDTH;
+      scrollTo(picsRef, 0, offset, false);
+    },
+    onBeginDrag: () => {
+      isScrollingDetails.value = true;
+    },
+    onEndDrag: () => {
+      isScrollingDetails.value = false;
+    },
+    onMomentumEnd: event => {
+      const index = Math.round(event.contentOffset.y / itemHeight);
+      checkAndSelectIndex(index);
+    },
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -110,16 +117,13 @@ const Home: FC = () => {
         selectedId={selectedId}
         picsRef={picsRef}
         scrollToAndSelect={scrollToAndSelect}
-        scrollX={scrollX}
-        picsScrolling={picsScrolling}
+        scrollHandlerPics={scrollHandlerPics}
       />
       <ProfileDetList
         profiles={profiles}
         itemHeight={itemHeight}
-        selectedId={selectedId}
         detailsRef={detailsRef}
-        scrollY={scrollY}
-        detsScrolling={detsScrolling}
+        scrollHandlerDetails={scrollHandlerDetails}
       />
     </SafeAreaView>
   );

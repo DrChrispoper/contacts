@@ -1,5 +1,6 @@
 import React from 'react';
-import { Animated, Dimensions, PanResponder } from 'react-native';
+import { Dimensions, FlatList, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { Profile } from '../utils/types';
 import ProfilePicture from './ProfilePicture';
 
@@ -9,10 +10,9 @@ interface Props {
   profiles: Array<Profile>;
   PICS_WIDTH: number;
   selectedId: string;
-  picsRef: React.MutableRefObject<any>;
+  picsRef: any;
   scrollToAndSelect: (id: string) => void;
-  scrollX: Animated.Value;
-  picsScrolling: (v: { value: number }) => void;
+  scrollHandlerPics: any;
 }
 
 const ProfilePicList = ({
@@ -21,38 +21,19 @@ const ProfilePicList = ({
   selectedId,
   picsRef,
   scrollToAndSelect,
-  scrollX,
-  picsScrolling,
-}: Props): JSX.Element => {
-  const panResponderPics = React.useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => {
-        // Listen for your events and show UI feedback here
-        // setisPics(true);
-        console.log('add pics listner');
-        scrollX.addListener(v => {
-          picsScrolling(v);
-        });
-        return false;
-      },
-      // eslint-disable-next-line comma-dangle
-    })
-  ).current;
-
-  const onScrollPics = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-    useNativeDriver: true,
-  });
-
-  const onMomentumScrollEnd = () => {
-    console.log('remove pics listner');
-    scrollX.removeAllListeners();
-  };
-
-  return (
-    <Animated.FlatList
+  scrollHandlerPics,
+}: Props): JSX.Element => (
+  <View
+    style={{
+      height: ScreenWidth,
+      marginTop: -100 - ScreenWidth / 2,
+      transform: [{ rotate: '-90deg' }],
+    }}
+  >
+    <FlatList
       contentContainerStyle={{
-        paddingLeft: ScreenWidth / 2 - PICS_WIDTH / 2,
-        paddingRight: ScreenWidth / 2 - PICS_WIDTH / 2,
+        paddingTop: ScreenWidth / 2 - PICS_WIDTH / 2,
+        paddingBottom: ScreenWidth / 2 - PICS_WIDTH / 2,
       }}
       data={profiles}
       renderItem={({ item }) => (
@@ -64,20 +45,19 @@ const ProfilePicList = ({
       )}
       keyExtractor={item => item.id}
       extraData={selectedId}
-      horizontal
       snapToAlignment="start"
       snapToInterval={PICS_WIDTH}
       decelerationRate="fast"
       style={{ height: 100 }}
+      renderScrollComponent={props => (
+        <Animated.ScrollView {...props} onScroll={scrollHandlerPics} />
+      )}
       ref={picsRef}
       showsHorizontalScrollIndicator={false}
       scrollEventThrottle={1}
-      onScroll={onScrollPics}
-      onMomentumScrollEnd={onMomentumScrollEnd}
+      initialNumToRender={profiles.length}
       getItemLayout={(data, index) => ({ length: PICS_WIDTH, offset: PICS_WIDTH * index, index })}
-      {...panResponderPics.panHandlers}
     />
-  );
-};
-
+  </View>
+);
 export default ProfilePicList;

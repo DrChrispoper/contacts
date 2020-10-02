@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TextStyle, TouchableOpacity, ViewStyle, Text, View } from 'react-native';
+import { StyleSheet, TextStyle, ViewStyle, Text, View } from 'react-native';
 import { Profile } from '../utils/types';
 
 interface Style {
@@ -45,24 +45,27 @@ const styles = StyleSheet.create<Style>({
 
 interface Props {
   item: Profile;
-  style: ViewStyle;
+  style?: ViewStyle;
+  inDetailsPage?: boolean;
 }
 
 class ProfileDetails extends React.PureComponent<Props> {
   render(): JSX.Element {
-    const { item, style } = this.props;
+    const { item, style, inDetailsPage = false } = this.props;
     return (
-      <TouchableOpacity style={[styles.item, style]}>
-        <View style={styles.name}>
-          <Text style={styles.name}>
-            <Text style={styles.firstName}>{item.firstName}</Text>
-            {` ${item.lastName}`}
-          </Text>
-        </View>
+      <View style={[styles.item, style]}>
+        {!inDetailsPage && (
+          <View style={styles.name}>
+            <Text style={styles.name}>
+              <Text style={styles.firstName}>{item.firstName}</Text>
+              {` ${item.lastName}`}
+            </Text>
+          </View>
+        )}
         <Text style={styles.role}>{item.role}</Text>
         <Text style={styles.aboutTitle}>About me</Text>
         <Text style={styles.description}>{item.description}</Text>
-      </TouchableOpacity>
+      </View>
     );
   }
 }
