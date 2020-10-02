@@ -23,27 +23,6 @@ const ProfilePicList = ({
   scrollToAndSelect,
   scrollHandlerPics,
 }: Props): JSX.Element => (
-  /* const panResponderPics = React.useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => {
-        // Listen for your events and show UI feedback here
-        // setisPics(true);
-        scrollX.addListener(v => {
-          picsScrolling(v);
-        });
-        return false;
-      },
-      // eslint-disable-next-line comma-dangle
-    })
-  ).current;
-
-  const onScrollPics = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-    useNativeDriver: true,
-  });
-
-  const onMomentumScrollEnd = () => {
-    scrollX.removeAllListeners();
-  }; */
   <View
     style={{
       height: ScreenWidth,

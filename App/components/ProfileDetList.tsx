@@ -18,27 +18,6 @@ const ProfileDetList = ({
   detailsRef,
   scrollHandlerDetails,
 }: Props): JSX.Element => (
-  /* const panResponderDetails = React.useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: () => {
-        // setisPics(false);
-        scrollY.addListener(v => {
-          detsScrolling(v);
-        });
-        return false;
-      },
-      // eslint-disable-next-line comma-dangle
-    })
-  ).current;
-
-  const onScrollDetails = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-    useNativeDriver: true,
-  });
-
-  const onMomentumScrollEnd = () => {
-    scrollY.removeAllListeners();
-  }; */
-
   <FlatList
     data={profiles}
     renderItem={({ item }) => <ProfileDetails item={item} style={{ height: itemHeight }} />}

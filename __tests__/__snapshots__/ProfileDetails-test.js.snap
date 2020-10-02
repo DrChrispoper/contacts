@@ -2,24 +2,18 @@
 
 exports[`renders correctly 1`] = `
 <View
-  accessible={true}
-  focusable={false}
-  onClick={[Function]}
-  onResponderGrant={[Function]}
-  onResponderMove={[Function]}
-  onResponderRelease={[Function]}
-  onResponderTerminate={[Function]}
-  onResponderTerminationRequest={[Function]}
-  onStartShouldSetResponder={[Function]}
   style={
-    Object {
-      "height": 580,
-      "marginHorizontal": 0,
-      "marginVertical": 0,
-      "opacity": 1,
-      "paddingLeft": 20,
-      "paddingRight": 20,
-    }
+    Array [
+      Object {
+        "marginHorizontal": 0,
+        "marginVertical": 0,
+        "paddingLeft": 20,
+        "paddingRight": 20,
+      },
+      Object {
+        "height": 580,
+      },
+    ]
   }
 >
   <View
