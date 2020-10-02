@@ -33,6 +33,7 @@ const ProfilePicList = ({
     <FlatList
       contentContainerStyle={{
         paddingTop: ScreenWidth / 2 - PICS_WIDTH / 2,
+        paddingBottom: ScreenWidth / 2 - PICS_WIDTH / 2,
       }}
       data={profiles}
       renderItem={({ item }) => (
