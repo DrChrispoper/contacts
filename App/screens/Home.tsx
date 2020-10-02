@@ -7,6 +7,7 @@ import {
   useAnimatedScrollHandler,
   scrollTo,
   useAnimatedRef,
+  useDerivedValue,
 } from 'react-native-reanimated';
 
 import getProfiles from '../utils/loadData';
@@ -47,6 +48,7 @@ const Home: FC<Props> = ({ navigation }: Props) => {
   const isScrollingDetails = useSharedValue(false);
   const transYD = useSharedValue(0);
   const transYP = useSharedValue(0);
+  const sharedSelectedId = useSharedValue(0);
 
   const itemHeight = ScreenHeight - (StatusBar.currentHeight || 0) - headerHeight - 20;
 
@@ -61,9 +63,18 @@ const Home: FC<Props> = ({ navigation }: Props) => {
 
     if (selectedId === id) {
       navigation.navigate('DetailPage', { item: profiles[index] });
+    } else {
+      sharedSelectedId.value = index;
+      if (Platform.OS === 'android') {
+        setSelectedId(id);
+      }
     }
   };
 
+  useDerivedValue(() => {
+    scrollTo(detailsRef, 0, sharedSelectedId.value * itemHeight, true);
+    scrollTo(picsRef, 0, sharedSelectedId.value * PICS_WIDTH, true);
+  });
   const scrollHandlerPics = useAnimatedScrollHandler({
     onScroll: event => {
       transYP.value = event.contentOffset.y;
