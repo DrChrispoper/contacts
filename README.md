@@ -14,6 +14,10 @@ I have done this application for an interview challenge for Emma. [Description](
 
 > A framework for building native apps with React.
 
+- [Reanimated2](https://github.com/software-mansion/react-native-reanimated)
+
+> React Native's Animated library reimplemented.
+
 [![runs with expo](https://img.shields.io/badge/Runs%20with%20Expo-000.svg?style=flat-square&logo=EXPO&labelColor=f3f3f3&logoColor=000)](https://expo.io/)
 
 ## Running the project
@@ -21,12 +25,13 @@ I have done this application for an interview challenge for Emma. [Description](
 - Clone this project
 
 Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn.
+#### `yarn`
 
 ### `expo start`
 
 Starts expo from where you can run the app.
 
-### `yarn start`
+#### `yarn start`
 
 Runs your app in development mode.
 
