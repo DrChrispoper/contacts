@@ -35,7 +35,7 @@ const DetailPage: FC<Props> = ({ route }: Props): JSX.Element => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.image}>
-        <ProfilePicture item={item} />
+        <ProfilePicture item={item} inDetailsPage />
       </View>
 
       <ProfileDetails item={item} inDetailsPage />

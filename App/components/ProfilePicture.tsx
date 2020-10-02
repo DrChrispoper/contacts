@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     width: 70,
     height: 70,
-    transform: [{ rotate: '90deg' }],
   },
   active: {
     overflow: 'hidden',
@@ -17,19 +16,26 @@ const styles = StyleSheet.create({
     borderColor: '#b1d8ff',
     borderRadius: 70 / 2,
   },
+  tempFix: {
+    transform: [{ rotate: '90deg' }],
+  },
 });
 
 interface Props {
   item: Profile;
   onPress?: () => void;
   isSelected?: boolean;
+  inDetailsPage?: boolean;
 }
 
 class ProfilePicture extends React.PureComponent<Props> {
   render(): JSX.Element {
-    const { item, onPress, isSelected = false } = this.props;
+    const { item, onPress, isSelected = false, inDetailsPage = false } = this.props;
     return (
-      <TouchableOpacity onPress={onPress} style={[styles.item, isSelected && styles.active]}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[styles.item, isSelected && styles.active, !inDetailsPage && styles.tempFix]}
+      >
         <Image source={item.picture} />
       </TouchableOpacity>
     );
