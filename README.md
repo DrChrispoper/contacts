@@ -19,45 +19,54 @@ I have done this application for an interview challenge for Emma. [Description](
 
 ## Running the project
 
-- Clone this project
+### 0. Requirements
 
-Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn.
+You will need the expo cli installed to run the project. To install the expo cli you can run this command:
+#### `yarn global add expo-cli`
+
+To run the project on your physical phone, you need to install the Expo Client app:
+
+[Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+[App Store](https://apps.apple.com/us/app/expo-client/id982107779)
+
+### 1. Clone this project
+
+The first step for running the code is to get it to your computer.
+You can clone this repo using the following command:
+
+#### `git clone https://github.com/DrChrispoper/contactsChallenge.git`
+
+Or download the archive of the release zip. [Release 1.0](https://github.com/DrChrispoper/contactsChallenge/releases/tag/v1.0)
+
+### 2. Install depencies
+
+The second step is to install the project depencies. You can do that using Yarn with the following command:
+
 #### `yarn`
+
+### 3. Launch expo
+
+To start expo run the following command:
 
 ### `expo start`
 
-Starts expo from where you can run the app.
+When you run `expo start`, Expo CLI starts Metro Bundler, which is an HTTP server that compiles the JavaScript code of our app using Babel and serves it to the Expo app. 
+It also pops up Expo Dev Tools in your browser, a graphical interface for Expo CLI.
 
-#### `yarn start`
+### 4. Preview the project
 
-Runs your app in development mode.
+#### Physical Devices
+Open the Expo development client on your device. 
+Scan the QR code printed by expo start with Expo Client (Android) or Camera (iOS). You may have to wait a minute while your project bundles and loads for the first time.
 
-#### `yarn test`
-
-Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
-
-#### `yarn ios`
-
-Like `yarn start`, but also attempts to open your app in the iOS Simulator if you're on a Mac and have it installed.
-
-#### `yarn android`
-
-Like `yarn start`, but also attempts to open your app on a connected Android device or emulator. Requires an installation of Android build tools (see [React Native docs](https://facebook.github.io/react-native/docs/getting-started.html) for detailed setup). We also recommend installing Genymotion as your Android emulator. Once you've finished setting up the native build environment, there are two options for making the right copy of `adb` available to Create React Native App:
-
+#### Simulator 
+Open the Expo Dev Tools on your browser.
+In the left side menu you can click on 'Run on Android/iOS simulator' to launch the project in the simulator.
 
 ## Testing
 
 We are use [Jest](https://facebook.github.io/jest/) testing library.
 
 To run the tests, execute ```yarn test``` in a terminal opened in the project folder.
-If you want to re-test each time you modify a test file, run ```yarn run test:watch```. Jest will watch for file changes and relaunch the tests for you.
-
-## TODO
-
-- [x] Initial Setup
-- [x] Vertical List of Text elements
-- [x] Text to JSON
-- [x] Horizontal List of Images
-- [x] Link Image to Text
-- [x] Link scrolling
-- [x] Detail View on Image Tap
+Jest will test components and make sure that changes that have been made in the code do not break how they are displayed. 
