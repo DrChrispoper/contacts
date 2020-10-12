@@ -1,9 +1,8 @@
-# Emma Contacts Challenge
+# Contacts Challenge
 
 # Context and goal
 
-I have done this application for an interview challenge for Emma. [Description](https://www.notion.so/React-Native-Engineering-challenge-cf7aa682c1c143d9b1bc73f17bb4f8a2)
-
+I have done this application as a personal challenge.
 
 ## Main technologies used
 
